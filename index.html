@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollama AI Model Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ollama AI Model Interface (Single Question)</h1>
+        <textarea id="prompt" placeholder="Enter your prompt here..."></textarea><br>
+        <button onclick="getOllamaResponse()">Get Response</button>
+    </div>
+
+    <script>
+        async function getOllamaResponse() {
+            const prompt = document.getElementById('prompt').value;
+            if (!prompt) {
+                alert('Please enter a prompt.');
+                return;
+            }
+
+            try {
+                const apiUrl = 'http://localhost:11434/api/generate';  // Replace with your Ollama API URL if different
+                const payload = {
+                    model: "deepseek-coder-v2:16b",  // Replace with the appropriate model name if different
+                    prompt: prompt,
+                    stream: false
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    console.log(response);
+                    throw new Error('Error calling the Ollama API');
+                }
+
+                const data = await response.json();
+                let newParagraph = document.createElement("p");
+                newParagraph.innerText = data.response;
+                document.body.appendChild(newParagraph);
+            } catch (error) {
+                console.error(error);
+                alert(error.message || 'An error occurred.');
+            }
+        }
+    </script>
+</body>
+</html>
